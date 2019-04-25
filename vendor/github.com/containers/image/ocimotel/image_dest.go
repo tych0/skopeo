@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/containers/image/pkg/blobinfocache/none"
 	"github.com/containers/image/types"
 	ispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
@@ -63,7 +64,27 @@ func (o *ociMotelImageDest) IgnoresEmbeddedDockerReference() bool {
 // to any other readers for download using the supplied digest.
 // If stream.Read() at any time, ESPECIALLY at end of input, returns an error, PutBlob MUST 1) fail, and 2) delete any data stored so far.
 func (o *ociMotelImageDest) PutBlob(ctx context.Context, stream io.Reader, inputInfo types.BlobInfo, cache types.BlobInfoCache, isConfig bool) (types.BlobInfo, error) {
-	return types.BlobInfo{}, fmt.Errorf("not implemented")
+	if inputInfo.Digest.String() != "" {
+		ok, info, err := o.TryReusingBlob(ctx, inputInfo, none.NoCache, false)
+		if err != nil {
+			return types.BlobInfo{}, err
+		}
+		if ok {
+			return info, nil
+		}
+	}
+
+	fmt.Printf("calling startlayer\n");
+	// Do this as a chunked upload so we can calculate the digest, since
+	// caller is not giving it to us.
+	path, err := o.s.StartLayer()
+	fmt.Printf("callled startlayer and got %s %v\n", path, err);
+	if err != nil {
+		return types.BlobInfo{}, err
+	}
+	digest, size, err := o.s.CompleteLayer(path, stream)
+	fmt.Printf("callled completelayer and got %v %d %v\n", digest, size, err)
+	return types.BlobInfo{ Digest: digest, Size: size}, err
 }
 
 // HasThreadSafePutBlob indicates whether PutBlob can be executed concurrently.
