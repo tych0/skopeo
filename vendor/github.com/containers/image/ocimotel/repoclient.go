@@ -2,13 +2,11 @@ package ocimotel
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 
 	"github.com/opencontainers/go-digest"
 	ispec "github.com/opencontainers/image-spec/specs-go/v1"
@@ -137,106 +135,30 @@ func (o *OciRepo) GetLayer(ldigest string) (io.ReadCloser, int64, error) {
 	return resp.Body, -1, err
 }
 
-type layerPutResult struct {
-	Location string `json:"Location"`
-	Length   string `json:"Content-Length"`
-	Digest   string `json:"Digest"`
-}
-
-type layerPostResult struct {
-	Location string `json:"Location"`
-	Range    string `json:"Range"`
-	Length   string `json:"Content-Length"`
-}
-
-func (o *OciRepo) StartLayer() (string, error) {
+func (o *OciRepo) PostLayer(ldigest digest.Digest, stream io.Reader) error {
 	name := o.ref.name
-	uri := fmt.Sprintf("%s/v2/%s/blobs/uploads/", o.url, name)
+	uri := fmt.Sprintf("%s/v2/%s/blobs/uploads/?digest=%s", o.url, name, ldigest.Encoded())
+
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", uri, nil)
+	req, err := http.NewRequest("POST", uri, stream)
 	if err != nil {
-		return "", errors.Wrap(err, "Failed opening POST request")
+		return errors.Wrap(err, "Failed opening POST request")
 	}
+	req.Header.Add("Host", "localhost")
+	// How to get the Content-Length from the stream?  I don't want to
+	// process the stream twice;  we could pass in the ocidir string
+	// and call fileSize on the blob path, but that sucks too.
+	//req.Header.Add("Content-Length", fmt.Sprintf("%d", size))
+	req.Header.Add("Content-Type", "binary/octet-stream")
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", errors.Wrapf(err, "Failed posting request %v", req)
+		return errors.Wrapf(err, "Failed posting request %v", req)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 201 {
-		return "", fmt.Errorf("Server returned an error %d", resp.StatusCode)
+		return fmt.Errorf("Server returned an error %d", resp.StatusCode)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", errors.Wrapf(err, "Error reading response body for %s", name)
-	}
-
-	var ret layerPostResult
-	err = json.Unmarshal(body, &ret)
-	if err != nil {
-		return "", errors.Wrap(err, "Failed decoding response")
-	}
-
-	return ret.Location, nil
-}
-
-// @path is the uuid upload path returned by the server to our Post request.
-// @stream is the data source for the layer.
-// Return the digest and size of the layer that was uploaded.
-func (o *OciRepo) CompleteLayer(path string, stream io.Reader) (digest.Digest, int64, error) {
-	uri := fmt.Sprintf("%s%s", o.url, path)
-	client := &http.Client{}
-	digester := sha256.New()
-	hashReader := io.TeeReader(stream, digester)
-	req, err := http.NewRequest("PATCH", uri, hashReader)
-	if err != nil {
-		return "", -1, errors.Wrap(err, "Failed opening Patch request")
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", -1, errors.Wrapf(err, "Failed posting request %v", req)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 204 {
-		return "", -1, fmt.Errorf("Server returned an error %d", resp.StatusCode)
-	}
-
-	ourDigest := fmt.Sprintf("%x", digester.Sum(nil))
-	uri = fmt.Sprintf("%s%s?digest=%s", o.url, path, ourDigest)
-	req, err = http.NewRequest("PUT", uri, nil)
-	if err != nil {
-		return "", -1, errors.Wrap(err, "Failed opening Put request")
-	}
-	putResp, err := client.Do(req)
-	if err != nil {
-		return "", -1, errors.Wrapf(err, "Failed putting request %v", req)
-	}
-	defer putResp.Body.Close()
-	if putResp.StatusCode != 204 {
-		return "", -1, fmt.Errorf("Server returned an error %d", putResp.StatusCode)
-	}
-
-	servDigest, ok := putResp.Header["Digest"]
-	if !ok || len(servDigest) != 1 {
-		return "", -1, fmt.Errorf("Server returned incomplete headers")
-	}
-	Length, ok := putResp.Header["Length"]
-	if !ok || len(Length) != 1 {
-		return "", -1, fmt.Errorf("Server returned incomplete headers")
-	}
-	length, err := strconv.ParseInt(Length[0], 10, 64)
-	if err != nil {
-		return "", -1, errors.Wrap(err, "Failed decoding length in response")
-	}
-
-	if servDigest[0] != ourDigest {
-		return "", -1, errors.Wrapf(err, "Server calculated digest %s, not our %s", servDigest[0], ourDigest)
-	}
-
-	// TODO ocimotel is returning the wrong thing - the hash,
-	// not the "digest", which is "sha256:hash"
-	d := digest.NewDigestFromEncoded(digest.SHA256, ourDigest)
-
-	return d, length, nil
+	return nil
 }
