@@ -148,10 +148,11 @@ func (opts *imageOptions) newSystemContext() (*types.SystemContext, error) {
 // imageDestOptions is a superset of imageOptions specialized for iamge destinations.
 type imageDestOptions struct {
 	*imageOptions
-	dirForceCompression         bool        // Compress layers when saving to the dir: transport
-	ociAcceptUncompressedLayers bool        // Whether to accept uncompressed layers in the oci: transport
-	compressionFormat           string      // Format to use for the compression
-	compressionLevel            optionalInt // Level to use for the compression
+	dirForceCompression            bool        // Compress layers when saving to the dir: transport
+	ociAcceptUncompressedLayers    bool        // Whether to accept uncompressed layers in the oci: transport
+	dockerAcceptUncompressedLayers bool   // Whether to accept uncompressed layers in the docker: transport
+	compressionFormat              string      // Format to use for the compression
+	compressionLevel               optionalInt // Level to use for the compression
 }
 
 // imageDestFlags prepares a collection of CLI flags writing into imageDestOptions, and the managed imageDestOptions structure.
@@ -162,6 +163,7 @@ func imageDestFlags(global *globalOptions, shared *sharedImageOptions, flagPrefi
 	fs.AddFlagSet(&genericFlags)
 	fs.BoolVar(&opts.dirForceCompression, flagPrefix+"compress", false, "Compress tarball image layers when saving to directory using the 'dir' transport. (default is same compression type as source)")
 	fs.BoolVar(&opts.ociAcceptUncompressedLayers, flagPrefix+"oci-accept-uncompressed-layers", false, "Allow uncompressed image layers when saving to an OCI image using the 'oci' transport. (default is to compress things that aren't compressed)")
+	fs.BoolVar(&opts.dockerAcceptUncompressedLayers, flagPrefix+"docker-accept-uncompressed-layers", false, "Allow uncompressed image layers when saving to a Docker repository using the 'docker' transport. (default is to compress things that aren't compressed)")
 	fs.StringVar(&opts.compressionFormat, flagPrefix+"compress-format", "", "`FORMAT` to use for the compression")
 	fs.Var(newOptionalIntValue(&opts.compressionLevel), flagPrefix+"compress-level", "`LEVEL` to use for the compression")
 	return fs, &opts
@@ -177,6 +179,7 @@ func (opts *imageDestOptions) newSystemContext() (*types.SystemContext, error) {
 
 	ctx.DirForceCompress = opts.dirForceCompression
 	ctx.OCIAcceptUncompressedLayers = opts.ociAcceptUncompressedLayers
+	ctx.DockerAcceptUncompressedLayers = opts.dockerAcceptUncompressedLayers
 	if opts.compressionFormat != "" {
 		cf, err := compression.AlgorithmByName(opts.compressionFormat)
 		if err != nil {
