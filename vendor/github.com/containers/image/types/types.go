@@ -496,6 +496,8 @@ type SystemContext struct {
 	DockerDisableV1Ping bool
 	// Directory to use for OSTree temporary files
 	OSTreeTmpDirPath string
+	// Allow uncompressed image layers in Docker images
+	DockerAcceptUncompressedLayers bool
 
 	// === docker/daemon.Transport overrides ===
 	// A directory containing a CA certificate (ending with ".crt"),

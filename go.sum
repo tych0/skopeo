@@ -93,6 +93,10 @@ github.com/syndtr/gocapability v0.0.0-20180916011248-d98352740cb2 h1:b6uOv7YOFK0
 github.com/syndtr/gocapability v0.0.0-20180916011248-d98352740cb2/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/tchap/go-patricia v2.2.6+incompatible h1:JvoDL7JSoIP2HDE8AbDH3zC8QBPxmzYe32HHy5yQ+Ck=
 github.com/tchap/go-patricia v2.2.6+incompatible/go.mod h1:bmLyhP68RS6kStMGxByiQ23RP/odRBOTVjwp2cDyi6I=
+github.com/tych0/image v1.5.2-0.20190712162347-e3d52e49e8c4 h1:g3vHzFmyRqPw5+Vdjl6VT/tnWsjFW/DwkmvO59Kyb+k=
+github.com/tych0/image v1.5.2-0.20190712162347-e3d52e49e8c4/go.mod h1:K47bBqht6Kcp+4Zn5BfKK+lns0vAbNBnUrk3E3jLeuI=
+github.com/tych0/image v1.5.2-0.20190712205941-6668f3fddc47 h1:ZpftCiKKwwLbS2xUECgdOCM8hDNsfuAna6Ln4DISiiE=
+github.com/tych0/image v1.5.2-0.20190712205941-6668f3fddc47/go.mod h1:K47bBqht6Kcp+4Zn5BfKK+lns0vAbNBnUrk3E3jLeuI=
 github.com/ulikunitz/xz v0.5.4 h1:zATC2OoZ8H1TZll3FpbX+ikwmadbO699PE06cIkm9oU=
 github.com/ulikunitz/xz v0.5.4/go.mod h1:2bypXElzHzzJZwzH67Y6wb67pO62Rzfn7BSiF4ABRW8=
 github.com/urfave/cli v1.20.0 h1:fDqGv3UG/4jbVl/QkFwEdddtEDjh/5Ov6X+0B/3bPaw=

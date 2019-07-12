@@ -64,3 +64,5 @@ require (
 	gopkg.in/yaml.v2 v2.0.0-20141029210843-d466437aa4ad // indirect
 	k8s.io/client-go v0.0.0-20181219152756-3dd551c0f083 // indirect
 )
+
+replace github.com/containers/image => github.com/tych0/image v1.5.2-0.20190712205941-6668f3fddc47

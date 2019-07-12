@@ -153,9 +153,10 @@ func (opts *imageOptions) newSystemContext() (*types.SystemContext, error) {
 // imageDestOptions is a superset of imageOptions specialized for iamge destinations.
 type imageDestOptions struct {
 	*imageOptions
-	osTreeTmpDir                string // A directory to use for OSTree temporary files
-	dirForceCompression         bool   // Compress layers when saving to the dir: transport
-	ociAcceptUncompressedLayers bool   // Whether to accept uncompressed layers in the oci: transport
+	osTreeTmpDir                   string // A directory to use for OSTree temporary files
+	dirForceCompression            bool   // Compress layers when saving to the dir: transport
+	ociAcceptUncompressedLayers    bool   // Whether to accept uncompressed layers in the oci: transport
+	dockerAcceptUncompressedLayers bool   // Whether to accept uncompressed layers in the docker: transport
 }
 
 // imageDestFlags prepares a collection of CLI flags writing into imageDestOptions, and the managed imageDestOptions structure.
@@ -179,6 +180,11 @@ func imageDestFlags(global *globalOptions, shared *sharedImageOptions, flagPrefi
 			Usage:       "Allow uncompressed image layers when saving to an OCI image using the 'oci' transport. (default is to compress things that aren't compressed)",
 			Destination: &opts.ociAcceptUncompressedLayers,
 		},
+		cli.BoolFlag{
+			Name:        flagPrefix + "docker-accept-uncompressed-layers",
+			Usage:       "Allow uncompressed image layers when saving to a Docker repository using the 'docker' transport. (default is to compress things that aren't compressed)",
+			Destination: &opts.dockerAcceptUncompressedLayers,
+		},
 	}...), &opts
 }
 
@@ -193,6 +199,7 @@ func (opts *imageDestOptions) newSystemContext() (*types.SystemContext, error) {
 	ctx.OSTreeTmpDirPath = opts.osTreeTmpDir
 	ctx.DirForceCompress = opts.dirForceCompression
 	ctx.OCIAcceptUncompressedLayers = opts.ociAcceptUncompressedLayers
+	ctx.DockerAcceptUncompressedLayers = opts.dockerAcceptUncompressedLayers
 	return ctx, err
 }
 
