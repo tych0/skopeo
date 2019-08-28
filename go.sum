@@ -11,6 +11,8 @@ github.com/VividCortex/ewma v1.1.1/go.mod h1:2Tkkvm3sRDVXaiyucHiACn4cqf7DpdyLvmx
 github.com/anuvu/image v0.0.0-20190620105408-742ed57617a3/go.mod h1:kgJ7R9dqjOhitwZyG3dvc8N2uga9BHJxOsHmYHUU678=
 github.com/anuvu/image v0.0.0-20190620105408-7da63ad87222 h1:48b9rqNc6znd9N297gxF3E/TTh7UOtbqkuPdmg7NiLg=
 github.com/anuvu/image v0.0.0-20190620105408-7da63ad87222/go.mod h1:kgJ7R9dqjOhitwZyG3dvc8N2uga9BHJxOsHmYHUU678=
+github.com/anuvu/image v1.5.2-0.20190827234748-f71edca6153a h1:iar1bS9SGM+83vSXXDxseRRM187LTG/TpJ2/fjc7BgE=
+github.com/anuvu/image v1.5.2-0.20190827234748-f71edca6153a/go.mod h1:kgJ7R9dqjOhitwZyG3dvc8N2uga9BHJxOsHmYHUU678=
 github.com/containerd/continuity v0.0.0-20180216233310-d8fb8589b0e8 h1:ZZOFPzvZO3N0f4LIQvZi68F2XDAMl/gqBfFMVjY6B3Y=
 github.com/containerd/continuity v0.0.0-20180216233310-d8fb8589b0e8/go.mod h1:GL3xCUCBDV3CZiTSEKksMWbLE66hEyuu9qyDOOqM47Y=
 github.com/containers/buildah v1.8.4 h1:06c+UNeEWMa2wA1Z7muZ0ZqUzE91sDuZJbB0BiZaeYQ=
